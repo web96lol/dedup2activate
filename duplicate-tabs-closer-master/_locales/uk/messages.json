@@ -31,10 +31,6 @@
     "message": "Зберегти старішу вкладку",
     "description": "Keep older tab"
   },
-  "keepReloadOlderTab": {
-    "message": "Зберегти й оновити старішу вкладку",
-    "description": "Keep and reload older tab"
-  },
   "keepTabWithHistory": {
     "message": "Зберегти вкладку з історією",
     "description": "Keep tab with history"
