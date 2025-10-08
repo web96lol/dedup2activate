@@ -84,17 +84,6 @@ const getActiveTabId = async (windowId) => {
 };
 
 // eslint-disable-next-line no-unused-vars
-const reloadTab = (tabId) => new Promise((resolve, reject) => {
-    chrome.tabs.reload(tabId, () => {
-        if (chrome.runtime.lastError) {
-            console.error("reloadTab error:", chrome.runtime.lastError.message);
-            reject();
-        }
-        else resolve();
-    });
-});
-
-// eslint-disable-next-line no-unused-vars
 const getActiveWindowId = () => new Promise((resolve) => {
     chrome.windows.getLastFocused(null, window => {
         if (chrome.runtime.lastError) console.error("getActiveWindowId error:", chrome.runtime.lastError.message);

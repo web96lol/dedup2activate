@@ -31,10 +31,6 @@
     "message": "古い方のタブを残す",
     "description": "Keep older tab"
   },
-  "keepReloadOlderTab": {
-    "message": "古い方のタブを残して再読み込みする",
-    "description": "Keep and reload older tab"
-  },
   "keepTabWithHistory": {
     "message": "タブの履歴を維持する",
     "description": "Keep tab with history"

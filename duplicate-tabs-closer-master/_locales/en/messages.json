@@ -31,10 +31,6 @@
     "message": "Keep older tab",
     "description": "Keep older tab"
   },
-  "keepReloadOlderTab": {
-    "message": "Keep and reload older tab",
-    "description": "Keep and reload older tab"
-  },
   "keepTabWithHistory": {
     "message": "Keep tab with history",
     "description": "Keep tab with history"
