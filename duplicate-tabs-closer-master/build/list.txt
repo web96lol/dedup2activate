@@ -1,15 +1,9 @@
-background.js
-badge.js
+background.bundle.js
 helper.js
 LICENSE
 manifest.json
-messageListener.js
-options.js
 README.md
 scriptImport.js
-tabsInfo.js
-urlUtils.js
-worker.js
 _locales
 ext_lib
 images

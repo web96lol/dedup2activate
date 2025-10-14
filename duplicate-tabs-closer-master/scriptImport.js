@@ -1,5 +1,5 @@
 try {
-  importScripts("helper.js", "tabsInfo.js", "options.js", "urlUtils.js", "badge.js", "worker.js", "messageListener.js", "background.js");
+  importScripts("helper.js", "background.bundle.js");
 } catch (e) {
   console.error(e);
 }

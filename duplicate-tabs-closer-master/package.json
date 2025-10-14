@@ -2,7 +2,7 @@
   "name": "duplicate-tabs-closer",
   "version": "1.0.0",
   "description": "Duplicate Tabs Closer detects and closes duplicate tabs.",
-  "main": "background.js",
+  "main": "background.bundle.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
