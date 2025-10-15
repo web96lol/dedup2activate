@@ -26,21 +26,14 @@ List of urls to not close automatically. Duplicate tabs skipped will be notified
 Wildcards and RegExp are supported.
 
 
-### Priority:
-(Used with option *Close tab automatically* and *Close all duplicate tabs* button)  
-* **Keep older tab** *(default)*: Keep the already existing tab.
-* **Keep newer tab**: Keep the newer tab.
-* **Keep tab with https** *(default on)*: Ignore the scheme part during comparison and keep the tab with the https scheme.
-* **Keep pinned tab** *(default on)*: Keep the pinned tab.
+### Duplicate resolution behavior
+(Used with option *Close tab automatically* and the *Close all duplicate tabs* button)
+The extension always keeps pinned tabs, prefers the HTTPS version of a page, and retains the older tab when deciding which duplicate to close. These rules are now built-in and no longer configurable.
 
 
 ### matchingRules:
 
-* **Ignore case in URL** *(default on)*
-* **Ignore 'www' in URL domain name** *(default on)*
-* **Ignore hash part in URL** *(default off)*
-* **Ignore search part in URL** *(default off)*
-* **Ignore path part in URL** *(default off)*
+URL comparisons always normalize links by forcing HTTPS, ignoring a leading `www`, comparing in lowercase, and keeping the full path, search, and hash segments. The remaining optional rule is:
 * **Compare with tab title** *(default off)*
 
 

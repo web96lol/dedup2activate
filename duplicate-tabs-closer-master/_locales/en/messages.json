@@ -19,29 +19,9 @@
     "message": "Show panel",
     "description": "Show panel"
   },
-  "tabPriority": {
-    "message": "Priority",
-    "description": "Priority"
-  },
-  "keepNewerTab": {
-    "message": "Keep newer tab",
-    "description": "Keep newer tab"
-  },
-  "keepOlderTab": {
-    "message": "Keep older tab",
-    "description": "Keep older tab"
-  },
   "keepTabWithHistory": {
     "message": "Keep tab with history",
     "description": "Keep tab with history"
-  },
-  "keeptabwithHttps": {
-    "message": "Keep tab with https",
-    "description": "Keep tab with https"
-  },
-  "keepPinnedTab": {
-    "message": "Keep pinned tab",
-    "description": "Keep pinned tab"
   },
   "onRemainingTab": {
     "message": "On remaining tab",
@@ -58,26 +38,6 @@
   "matchingRules": {
     "message": "Matching rules",
     "description": "Matching rules"
-  },
-  "ignoreHashPart": {
-    "message": "Ignore hash part in URL",
-    "description": "Ignore hash part in URL"
-  },
-  "ignoreSearchPart": {
-    "message": "Ignore search part in URL",
-    "description": "Ignore search part in URL"
-  },
-  "ignorePathPart": {
-    "message": "Ignore path part in URL",
-    "description": "Ignore path part in URL"
-  },
-  "ignore3w": {
-    "message": "Ignore 'www' in URL domain name",
-    "description": "Ignore 'www' in URL domain name"
-  },
-  "caseInsensitive": {
-    "message": "Ignore case in URL",
-    "description": "Ignore case in URL"
   },
   "compareWithTitle": {
     "message": "Compare with title",

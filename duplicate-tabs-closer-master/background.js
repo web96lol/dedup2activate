@@ -97,43 +97,16 @@ const defaultOptions = {
     onRemainingTab: {
         value: "A"
     },
-    keepTabBasedOnAge: {
-        value: "O" // "O" (older) or "N" (newer)
-    },
-    keepTabWithHttps: {
-        value: true
-    },
-    keepPinnedTab: {
-        value: true
-    },
     keepTabWithHistory: {
         value: false
     },
     scope: {
         value: "C"
     },
-    ignoreHashPart: {
-        value: false
-    },
-    ignoreSearchPart: {
-        value: false
-    },
-    ignorePathPart: {
-        value: false
-    },
-    ignore3w: {
-        value: true
-    },
-    caseInsensitive: {
-        value: true
-    },
     compareWithTitle: {
         value: false
     },
     onDuplicateTabDetectedPinned: {
-        value: true
-    },
-    tabPriorityPinned: {
         value: true
     },
     matchingRulesPinned: {
@@ -229,15 +202,7 @@ const setOptions = (storedOptions) => {
     options.autoCloseTab = storedOptions.onDuplicateTabDetected.value === "A";
     options.defaultTabBehavior = storedOptions.onRemainingTab.value === "B";
     options.activateKeptTab = storedOptions.onRemainingTab.value === "A";
-    options.keepNewerTab = storedOptions.keepTabBasedOnAge.value === "N";
-    options.keepTabWithHttps = storedOptions.keepTabWithHttps.value;
-    options.keepPinnedTab = storedOptions.keepPinnedTab.value;
-    options.ignoreHashPart = storedOptions.ignoreHashPart.value;
-    options.ignoreSearchPart = storedOptions.ignoreSearchPart.value;
-    options.ignorePathPart = storedOptions.ignorePathPart.value;
     options.compareWithTitle = storedOptions.compareWithTitle.value;
-    options.ignore3w = storedOptions.ignore3w.value;
-    options.caseInsensitive = storedOptions.caseInsensitive.value;
     options.searchInAllWindows = storedOptions.scope.value === "A" || storedOptions.scope.value === "CA";
     options.searchPerContainer = storedOptions.scope.value === "CC" || storedOptions.scope.value === "CA";
     options.whiteList = whiteListToPattern(storedOptions.whiteList.value);
@@ -314,49 +279,27 @@ const isHttps = (url) => {
 // eslint-disable-next-line no-unused-vars
 const getMatchingURL = (url) => {	
 	if (!isValidURL(url)) return url;
-	let matchingURL = url;
-	if (options.ignorePathPart) {
-		const uri = new URL(matchingURL);
-		matchingURL = uri.origin;
-	}
-	else if (options.ignoreSearchPart) {
-		matchingURL = matchingURL.split("?")[0];
-	}
-	else if (options.ignoreHashPart) {
-		matchingURL = matchingURL.split("#")[0];
-	}
-	if (options.keepTabWithHttps) {
-		matchingURL = matchingURL.replace(/^http:\/\//i, "https://");
-	}
-	if (options.ignore3w) {
-		matchingURL = matchingURL.replace("://www.", "://");
-	}
-	if (options.caseInsensitive) {
-		matchingURL = matchingURL.toLowerCase();
-	}
-	matchingURL = matchingURL.replace(/\/$/, "");
-	return matchingURL;
+        let matchingURL = url;
+        matchingURL = matchingURL.replace(/^http:\/\//i, "https://");
+        matchingURL = matchingURL.toLowerCase();
+        matchingURL = matchingURL.replace("://www.", "://");
+        matchingURL = matchingURL.replace(/\/$/, "");
+        return matchingURL;
 };
 
 // eslint-disable-next-line no-unused-vars
 const getMatchPatternURL = (url) => {
-	let urlPattern = null;
-	if (isValidURL(url)) {
-		const uri = new URL(url);
-		urlPattern = `*://${uri.hostname}`;
-		if (options.ignorePathPart) {
-			urlPattern += "/*";
-		}
-		else {
-			urlPattern += uri.pathname;
-			if (uri.search || uri.hash) {
-				urlPattern += "*";
-			}
-		}
-	}
-	else if (isBrowserURL(url)) {
-		urlPattern = `${url}*`;
-	}
+        let urlPattern = null;
+        if (isValidURL(url)) {
+                const uri = new URL(url);
+                urlPattern = `*://${uri.hostname}${uri.pathname}`;
+                if (uri.search || uri.hash) {
+                        urlPattern += "*";
+                }
+        }
+        else if (isBrowserURL(url)) {
+                urlPattern = `${url}*`;
+        }
 
 	return urlPattern;
 };"use strict";
@@ -431,42 +374,30 @@ const matchTitle = (tab1, tab2) => {
 };
 
 const getHttpsTabId = (observedTab, observedTabUrl, openedTab) => {
-    if (options.keepTabWithHttps) {
-        const regex = /^https:\/\//i;
-        const match1 = regex.test(observedTabUrl);
-        const match2 = regex.test(openedTab.url);
-        if (match1) {
-            return match2 ? null : observedTab.id;
-        } else {
-            return match2 ? openedTab.id : null;
-        }
+    const regex = /^https:\/\//i;
+    const match1 = regex.test(observedTabUrl);
+    const match2 = regex.test(openedTab.url);
+    if (match1) {
+        return match2 ? null : observedTab.id;
+    } else {
+        return match2 ? openedTab.id : null;
     }
-    return null;
 };
 
 const getPinnedTabId = (tab1, tab2) => {
-    if (options.keepPinnedTab) {
-        if (tab1.pinned) {
-            return tab2.pinned ? null : tab1.id;
-        } else {
-            return tab2.pinned ? tab2.id : null;
-        }
+    if (tab1.pinned) {
+        return tab2.pinned ? null : tab1.id;
+    } else {
+        return tab2.pinned ? tab2.id : null;
     }
-    return null;
 };
 
 const getLastUpdatedTabId = (observedTab, openedTab) => {
     const observedTabLastUpdate = tabsInfo.getLastComplete(observedTab.id);
     const openedTabLastUpdate = tabsInfo.getLastComplete(openedTab.id);
-    if (options.keepNewerTab) {
-        if (observedTabLastUpdate === null) return observedTab.id;
-        if (openedTabLastUpdate === null) return openedTab.id;
-        return (observedTabLastUpdate > openedTabLastUpdate) ? observedTab.id : openedTab.id;
-    } else {
-        if (observedTabLastUpdate === null) return openedTab.id;
-        if (openedTabLastUpdate === null) return observedTab.id;
-        return (observedTabLastUpdate < openedTabLastUpdate) ? observedTab.id : openedTab.id;
-    }
+    if (observedTabLastUpdate === null) return openedTab.id;
+    if (openedTabLastUpdate === null) return observedTab.id;
+    return (observedTabLastUpdate < openedTabLastUpdate) ? observedTab.id : openedTab.id;
 };
 
 const getFocusedTab = (observedTab, openedTab, activeWindowId, retainedTabId) => {

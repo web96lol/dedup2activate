@@ -24,35 +24,10 @@
         "description": "Show panel",
         "hash": "3519be2a903e741db8c653b0e7e341e8"
     },
-    "tabPriority": {
-        "message": "优先级",
-        "description": "Priority",
-        "hash": "a47af5c8632e36b75d0299167f2b38e0"
-    },
-    "keepNewerTab": {
-        "message": "保留新的标签页",
-        "description": "Keep newer tab",
-        "hash": "a3aa6ddd27496953c1d39e89d344f609"
-    },
-    "keepOlderTab": {
-        "message": "保留旧的标签页",
-        "description": "Keep older tab",
-        "hash": "17c1cecef3fb5c4c822c709e32428724"
-    },
     "keepTabWithHistory": {
         "message": "保留有历史记录的标签页",
         "description": "Keep tab with history",
         "hash": "23668f9ee2e1380d81db5eedce7e778b"
-    },
-    "keeptabwithHttps": {
-        "message": "保留 https 的标签页",
-        "description": "Keep tab with https",
-        "hash": "158afd64eff0d0d42ec5fcdc69456b39"
-    },
-    "keepPinnedTab": {
-        "message": "保留固定的标签页",
-        "description": "Keep pinned tab",
-        "hash": "eeded9a172a2db461ba5b29f7a4c9fce"
     },
     "onRemainingTab": {
         "message": "剩余标签页",
@@ -74,29 +49,6 @@
         "description": "MatchingRules",
         "hash": "e86eed212e60224faadd11386632e100"
     },
-    "ignoreHashPart": {
-        "message": "忽略标签页 URL 中的井字部分",
-        "description": "Ignore hash part in URL",
-        "hash": "bbeeddb75b5f0c1d72685cf06108c3e3"
-    },
-    "ignoreSearchPart": {
-        "message": "忽略标签页 URL 中的问号部分",
-        "description": "Ignore search part in URL",
-        "hash": "719a708f82ce50153de4e90a4b697a84"
-    },
-    "ignorePathPart": {
-        "message": "忽略标签页 URL 中的路径部分",
-        "description": "Ignore path part in URL",
-        "hash": "c05dc772b761f094ec2b99f692c26148"
-    },
-    "ignore3w": {
-        "message": "Ignore 'www' in URL domain name",
-        "description": "Ignore 'www' in URL domain name"
-      },
-      "caseInsensitive": {
-        "message": "Ignore case in URL",
-        "description": "Ignore case in URL"
-      },
     "compareWithTitle": {
         "message": "比较依据标签页标题",
         "description": "Compare with title",
