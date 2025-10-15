@@ -3,25 +3,85 @@
     "message": "Параметры",
     "description": "Options"
   },
-  "automaticHandling": {
-    "message": "Автоматическая обработка дубликатов",
-    "description": "Заголовок раздела для автоматического удаления дубликатов"
+  "onDuplicateTabDetected": {
+    "message": "Если обнаружен дубликат вкладки",
+    "description": "On duplicate tab detected"
   },
-  "automaticHandlingDescription": {
-    "message": "Дубликаты вкладок закрываются автоматически. Используйте белый список, чтобы оставить нужные URL открытыми.",
-    "description": "Пояснение про автоматическое закрытие и белый список."
+  "doNothing": {
+    "message": "Ничего не делать",
+    "description": "Do nothing"
+  },
+  "autoCloseTab": {
+    "message": "Закрыть вкладку автоматически",
+    "description": "Close tab automatically"
+  },
+  "contextMenuCloseDuplicates": {
+    "message": "Закрыть дубликаты вкладок",
+    "description": "Context menu item that closes duplicate tabs"
   },
   "showPanel": {
     "message": "Показать панель",
     "description": "Show panel"
   },
+  "tabPriority": {
+    "message": "Приоритет",
+    "description": "Priority"
+  },
+  "keepNewerTab": {
+    "message": "Сохранить новейшую вкладку",
+    "description": "Keep newer tab"
+  },
+  "keepOlderTab": {
+    "message": "Сохранить старейшую вкладку",
+    "description": "Keep older tab"
+  },
   "keepTabWithHistory": {
     "message": "Сохранить вкладку с историей",
     "description": "Keep tab with history"
   },
+  "keeptabwithHttps": {
+    "message": "Сохранить вкладку с https",
+    "description": "Keep tab with https"
+  },
+  "keepPinnedTab": {
+    "message": "Сохранить закрепленную вкладку",
+    "description": "Keep pinned tab"
+  },
+  "onRemainingTab": {
+    "message": "Оставшуюся вкладку...",
+    "description": "On remaining tab"
+  },
+  "activateKeptTab": {
+    "message": "Сделать активной",
+    "description": "Activate"
+  },
+  "defaultTabBehavior": {
+    "message": "Поведение вкладки по умолчанию",
+    "description": "Default tab behaviour"
+  },
   "matchingRules": {
     "message": "Matching rules",
     "description": "Matching rules"
+  },
+  "ignoreHashPart": {
+    "message": "Игнорировать хэш-часть в URL вкладки",
+    "description": "Ignore hash part in URL"
+  },
+  "ignoreSearchPart": {
+    "message": "Игнорировать часть поиска в URL вкладки",
+    "description": "Ignore search part in URL"
+  },
+  "ignorePathPart": {
+    "message": "Игнорировать часть пути в URL вкладки",
+    "description": "Ignore path part in URL"
+  },
+  "ignore3w": {
+    "message": "Ignore 'www' in URL domain name",
+    "description": "Ignore 'www' in URL domain name"
+  },
+  "caseInsensitive": {
+    "message": "Ignore case in URL",
+    "description": "Ignore case in URL"
   },
   "compareWithTitle": {
     "message": "Сравнить заголовки вкладок",

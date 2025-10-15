@@ -33,6 +33,7 @@
     "cookies",
     "tabs",
     "webNavigation",
+    "contextMenus",
     "storage",
     "contextualIdentities"
   ],

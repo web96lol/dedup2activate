@@ -3,25 +3,85 @@
     "message": "Опції",
     "description": "Options"
   },
-  "automaticHandling": {
-    "message": "Автоматична обробка дублікатів",
-    "description": "Заголовок розділу для автоматичної обробки дублікатів"
+  "onDuplicateTabDetected": {
+    "message": "Якщо виявлено дублікат вкладки",
+    "description": "On duplicate tab detected"
   },
-  "automaticHandlingDescription": {
-    "message": "Дублікати вкладок закриваються автоматично. Використовуйте білий список, щоб залишити потрібні URL відкритими.",
-    "description": "Пояснення про автоматичне закриття та білий список."
+  "doNothing": {
+    "message": "Нічого не робити",
+    "description": "Do nothing"
+  },
+  "autoCloseTab": {
+    "message": "Закрити вкладку автоматично",
+    "description": "Close tab automatically"
+  },
+  "contextMenuCloseDuplicates": {
+    "message": "Закрити дублікати вкладок",
+    "description": "Context menu item that closes duplicate tabs"
   },
   "showPanel": {
     "message": "Показати панель",
     "description": "Show panel"
   },
+  "tabPriority": {
+    "message": "Пріоритет",
+    "description": "Priority"
+  },
+  "keepNewerTab": {
+    "message": "Зберегти новішу вкладку",
+    "description": "Keep newer tab"
+  },
+  "keepOlderTab": {
+    "message": "Зберегти старішу вкладку",
+    "description": "Keep older tab"
+  },
   "keepTabWithHistory": {
     "message": "Зберегти вкладку з історією",
     "description": "Keep tab with history"
   },
+  "keeptabwithHttps": {
+    "message": "Зберегти вкладку з https",
+    "description": "Keep tab with https"
+  },
+  "keepPinnedTab": {
+    "message": "Зберегти закріплену вкладку",
+    "description": "Keep pinned tab"
+  },
+  "onRemainingTab": {
+    "message": "Вкладку, що залишилася...",
+    "description": "On remaining tab"
+  },
+  "activateKeptTab": {
+    "message": "Зробити активною",
+    "description": "Activate"
+  },
+  "defaultTabBehavior": {
+    "message": "Поведінка вкладки за замовчуванням",
+    "description": "Default tab behaviour"
+  },
   "matchingRules": {
     "message": "Matching rules",
     "description": "Matching rules"
+  },
+  "ignoreHashPart": {
+    "message": "Ігнорувати хеш-частину в URL вкладки",
+    "description": "Ignore hash part in URL"
+  },
+  "ignoreSearchPart": {
+    "message": "Ігнорувати частину пошуку в URL вкладки",
+    "description": "Ignore search part in URL"
+  },
+  "ignorePathPart": {
+    "message": "Ігнорувати частину шляху в URL вкладки",
+    "description": "Ignore path part in URL"
+  },
+  "ignore3w": {
+    "message": "Ignore 'www' in URL domain name",
+    "description": "Ignore 'www' in URL domain name"
+  },
+  "caseInsensitive": {
+    "message": "Ignore case in URL",
+    "description": "Ignore case in URL"
   },
   "compareWithTitle": {
     "message": "Порівняти заголовки вкладок",

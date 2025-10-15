@@ -6,22 +6,42 @@ deDup2Activate detects and closes duplicate tabs.
 * Use the WebExtensions API
 * Support [Firefox](https://addons.mozilla.org/en-US/firefox/addon/duplicate-tabs-closer) and [Chrome](https://chrome.google.com/webstore/detail/duplicate-tabs-closer/gnmdbogfankgjepgglmmfmbnimcmcjle)
 * Firefox Container Tab feature is supported.
+* Includes a toolbar context menu item **Duplicate Tab Closer** to trigger a manual duplicate sweep.
 
 ## Options:
 
-### Automatic duplicate handling
+### On duplicate tab detected:
 
-Duplicate tabs are always closed automatically. Use the whitelist to keep specific URLs open. Wildcards and RegExp are supported, and skipped duplicates are still reflected in the badge count.
+* **Close tab automatically** *(default)*: automatically closes the detected duplicate tab.
+* **Do nothing**: monitor tabs and update the badge icon to indicate the number of duplicate tabs detected.
+
+#### On remaining tab:
+(Used with option *Close tab automatically*)
+* **Activate** *(default)*: once the duplicate tab is closed, the remaining tab is activated.
+* **Do nothing**: nothing is done after the duplicate tab is closed.
+* **Apply opening tab behavior**: once the duplicate tab is closed, depending on the default tab behavior, the remaining tab will be moved to the position of the closed tab and activated if needed.
+
+#### Whiltelist":
+(Used with option *Close tab automatically*)  
+List of urls to not close automatically. Duplicate tabs skipped will be notified in badge.  
+Wildcards and RegExp are supported.
 
 
-### Duplicate resolution behavior
-(Used when the extension closes duplicates automatically or when you use the *Close all duplicate tabs* button)
-The extension always keeps pinned tabs, prefers the HTTPS version of a page, and retains the older tab when deciding which duplicate to close. These rules are now built-in and no longer configurable.
+### Priority:
+(Used with option *Close tab automatically* and *Close all duplicate tabs* button)  
+* **Keep older tab** *(default)*: Keep the already existing tab.
+* **Keep newer tab**: Keep the newer tab.
+* **Keep tab with https** *(default on)*: Ignore the scheme part during comparison and keep the tab with the https scheme.
+* **Keep pinned tab** *(default on)*: Keep the pinned tab.
 
 
 ### matchingRules:
 
-URL comparisons always normalize links by forcing HTTPS, ignoring a leading `www`, comparing in lowercase, and keeping the full path, search, and hash segments. The remaining optional rule is:
+* **Ignore case in URL** *(default on)*
+* **Ignore 'www' in URL domain name** *(default on)*
+* **Ignore hash part in URL** *(default off)*
+* **Ignore search part in URL** *(default off)*
+* **Ignore path part in URL** *(default off)*
 * **Compare with tab title** *(default off)*
 
 

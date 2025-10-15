@@ -22,6 +22,7 @@
   "permissions": [
     "tabs",
     "webNavigation",
+    "contextMenus",
     "storage"
   ],
   "options_ui": {

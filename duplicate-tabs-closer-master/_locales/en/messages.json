@@ -3,25 +3,85 @@
     "message": "Options",
     "description": "Options"
   },
-  "automaticHandling": {
-    "message": "Automatic duplicate handling",
-    "description": "Section title for automatic duplicate handling"
+  "onDuplicateTabDetected": {
+    "message": "On duplicate tab detected",
+    "description": "On duplicate tab detected"
   },
-  "automaticHandlingDescription": {
-    "message": "Duplicate tabs close automatically. Use the whitelist to keep specific URLs open.",
-    "description": "Explains that duplicates are always closed and how to use the whitelist."
+  "doNothing": {
+    "message": "Do nothing",
+    "description": "Do nothing"
+  },
+  "autoCloseTab": {
+    "message": "Close tab automatically",
+    "description": "Close tab automatically"
+  },
+  "contextMenuCloseDuplicates": {
+    "message": "Duplicate Tab Closer",
+    "description": "Context menu item that closes duplicate tabs"
   },
   "showPanel": {
     "message": "Show panel",
     "description": "Show panel"
   },
+  "tabPriority": {
+    "message": "Priority",
+    "description": "Priority"
+  },
+  "keepNewerTab": {
+    "message": "Keep newer tab",
+    "description": "Keep newer tab"
+  },
+  "keepOlderTab": {
+    "message": "Keep older tab",
+    "description": "Keep older tab"
+  },
   "keepTabWithHistory": {
     "message": "Keep tab with history",
     "description": "Keep tab with history"
   },
+  "keeptabwithHttps": {
+    "message": "Keep tab with https",
+    "description": "Keep tab with https"
+  },
+  "keepPinnedTab": {
+    "message": "Keep pinned tab",
+    "description": "Keep pinned tab"
+  },
+  "onRemainingTab": {
+    "message": "On remaining tab",
+    "description": "On remaining tab"
+  },
+  "activateKeptTab": {
+    "message": "Activate",
+    "description": "Activate"
+  },
+  "defaultTabBehavior": {
+    "message": "Default tab behaviour",
+    "description": "Default tab behaviour"
+  },
   "matchingRules": {
     "message": "Matching rules",
     "description": "Matching rules"
+  },
+  "ignoreHashPart": {
+    "message": "Ignore hash part in URL",
+    "description": "Ignore hash part in URL"
+  },
+  "ignoreSearchPart": {
+    "message": "Ignore search part in URL",
+    "description": "Ignore search part in URL"
+  },
+  "ignorePathPart": {
+    "message": "Ignore path part in URL",
+    "description": "Ignore path part in URL"
+  },
+  "ignore3w": {
+    "message": "Ignore 'www' in URL domain name",
+    "description": "Ignore 'www' in URL domain name"
+  },
+  "caseInsensitive": {
+    "message": "Ignore case in URL",
+    "description": "Ignore case in URL"
   },
   "compareWithTitle": {
     "message": "Compare with title",

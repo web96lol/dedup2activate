@@ -85,11 +85,29 @@ class TabsInfo {
 }
 
 // eslint-disable-next-line no-unused-vars
-const tabsInfo = new TabsInfo();"use strict";
+const tabsInfo = new TabsInfo();
+
+const CONTEXT_MENU_CLOSE_DUPLICATES_ID = "close-duplicate-tabs";
+"use strict";
 
 const defaultOptions = {
     shrunkMode: {
         value: false
+    },
+    onDuplicateTabDetected: {
+        value: "A"
+    },
+    onRemainingTab: {
+        value: "A"
+    },
+    keepTabBasedOnAge: {
+        value: "O" // "O" (older) or "N" (newer)
+    },
+    keepTabWithHttps: {
+        value: true
+    },
+    keepPinnedTab: {
+        value: true
     },
     keepTabWithHistory: {
         value: false
@@ -97,10 +115,28 @@ const defaultOptions = {
     scope: {
         value: "C"
     },
+    ignoreHashPart: {
+        value: false
+    },
+    ignoreSearchPart: {
+        value: false
+    },
+    ignorePathPart: {
+        value: false
+    },
+    ignore3w: {
+        value: true
+    },
+    caseInsensitive: {
+        value: true
+    },
     compareWithTitle: {
         value: false
     },
-    automaticHandlingPinned: {
+    onDuplicateTabDetectedPinned: {
+        value: true
+    },
+    tabPriorityPinned: {
         value: true
     },
     matchingRulesPinned: {
@@ -186,13 +222,25 @@ const setStoredOption = async (name, value, refresh) => {
     saveStoredOptions(storedOptions);
     setOptions(storedOptions);
     if (refresh) refreshGlobalDuplicateTabsInfo();
+    else if (name === "onDuplicateTabDetected") setBadgeIcon();
     else if (name === "showBadgeIfNoDuplicateTabs" || name === "badgeColorNoDuplicateTabs" || name === "badgeColorDuplicateTabs") updateBadgeStyle();
 };
 
 const options = {};
 
 const setOptions = (storedOptions) => {
+    options.autoCloseTab = storedOptions.onDuplicateTabDetected.value === "A";
+    options.defaultTabBehavior = storedOptions.onRemainingTab.value === "B";
+    options.activateKeptTab = storedOptions.onRemainingTab.value === "A";
+    options.keepNewerTab = storedOptions.keepTabBasedOnAge.value === "N";
+    options.keepTabWithHttps = storedOptions.keepTabWithHttps.value;
+    options.keepPinnedTab = storedOptions.keepPinnedTab.value;
+    options.ignoreHashPart = storedOptions.ignoreHashPart.value;
+    options.ignoreSearchPart = storedOptions.ignoreSearchPart.value;
+    options.ignorePathPart = storedOptions.ignorePathPart.value;
     options.compareWithTitle = storedOptions.compareWithTitle.value;
+    options.ignore3w = storedOptions.ignore3w.value;
+    options.caseInsensitive = storedOptions.caseInsensitive.value;
     options.searchInAllWindows = storedOptions.scope.value === "A" || storedOptions.scope.value === "CA";
     options.searchPerContainer = storedOptions.scope.value === "CC" || storedOptions.scope.value === "CA";
     options.whiteList = whiteListToPattern(storedOptions.whiteList.value);
@@ -269,34 +317,56 @@ const isHttps = (url) => {
 // eslint-disable-next-line no-unused-vars
 const getMatchingURL = (url) => {	
 	if (!isValidURL(url)) return url;
-        let matchingURL = url;
-        matchingURL = matchingURL.replace(/^http:\/\//i, "https://");
-        matchingURL = matchingURL.toLowerCase();
-        matchingURL = matchingURL.replace("://www.", "://");
-        matchingURL = matchingURL.replace(/\/$/, "");
-        return matchingURL;
+	let matchingURL = url;
+	if (options.ignorePathPart) {
+		const uri = new URL(matchingURL);
+		matchingURL = uri.origin;
+	}
+	else if (options.ignoreSearchPart) {
+		matchingURL = matchingURL.split("?")[0];
+	}
+	else if (options.ignoreHashPart) {
+		matchingURL = matchingURL.split("#")[0];
+	}
+	if (options.keepTabWithHttps) {
+		matchingURL = matchingURL.replace(/^http:\/\//i, "https://");
+	}
+	if (options.ignore3w) {
+		matchingURL = matchingURL.replace("://www.", "://");
+	}
+	if (options.caseInsensitive) {
+		matchingURL = matchingURL.toLowerCase();
+	}
+	matchingURL = matchingURL.replace(/\/$/, "");
+	return matchingURL;
 };
 
 // eslint-disable-next-line no-unused-vars
 const getMatchPatternURL = (url) => {
-        let urlPattern = null;
-        if (isValidURL(url)) {
-                const uri = new URL(url);
-                urlPattern = `*://${uri.hostname}${uri.pathname}`;
-                if (uri.search || uri.hash) {
-                        urlPattern += "*";
-                }
-        }
-        else if (isBrowserURL(url)) {
-                urlPattern = `${url}*`;
-        }
+	let urlPattern = null;
+	if (isValidURL(url)) {
+		const uri = new URL(url);
+		urlPattern = `*://${uri.hostname}`;
+		if (options.ignorePathPart) {
+			urlPattern += "/*";
+		}
+		else {
+			urlPattern += uri.pathname;
+			if (uri.search || uri.hash) {
+				urlPattern += "*";
+			}
+		}
+	}
+	else if (isBrowserURL(url)) {
+		urlPattern = `${url}*`;
+	}
 
 	return urlPattern;
 };"use strict";
 
 // eslint-disable-next-line no-unused-vars
 const setBadgeIcon = () => {
-        chrome.action.setIcon({ path: "images/auto_close_16.png" });
+	chrome.action.setIcon({ path: options.autoCloseTab ? "images/auto_close_16.png" : "images/manual_close_16.png" });
 	if (environment.isFirefox) browser.action.setBadgeTextColor({ color: "white" });
 };
 
@@ -364,30 +434,42 @@ const matchTitle = (tab1, tab2) => {
 };
 
 const getHttpsTabId = (observedTab, observedTabUrl, openedTab) => {
-    const regex = /^https:\/\//i;
-    const match1 = regex.test(observedTabUrl);
-    const match2 = regex.test(openedTab.url);
-    if (match1) {
-        return match2 ? null : observedTab.id;
-    } else {
-        return match2 ? openedTab.id : null;
+    if (options.keepTabWithHttps) {
+        const regex = /^https:\/\//i;
+        const match1 = regex.test(observedTabUrl);
+        const match2 = regex.test(openedTab.url);
+        if (match1) {
+            return match2 ? null : observedTab.id;
+        } else {
+            return match2 ? openedTab.id : null;
+        }
     }
+    return null;
 };
 
 const getPinnedTabId = (tab1, tab2) => {
-    if (tab1.pinned) {
-        return tab2.pinned ? null : tab1.id;
-    } else {
-        return tab2.pinned ? tab2.id : null;
+    if (options.keepPinnedTab) {
+        if (tab1.pinned) {
+            return tab2.pinned ? null : tab1.id;
+        } else {
+            return tab2.pinned ? tab2.id : null;
+        }
     }
+    return null;
 };
 
 const getLastUpdatedTabId = (observedTab, openedTab) => {
     const observedTabLastUpdate = tabsInfo.getLastComplete(observedTab.id);
     const openedTabLastUpdate = tabsInfo.getLastComplete(openedTab.id);
-    if (observedTabLastUpdate === null) return openedTab.id;
-    if (openedTabLastUpdate === null) return observedTab.id;
-    return (observedTabLastUpdate < openedTabLastUpdate) ? observedTab.id : openedTab.id;
+    if (options.keepNewerTab) {
+        if (observedTabLastUpdate === null) return observedTab.id;
+        if (openedTabLastUpdate === null) return openedTab.id;
+        return (observedTabLastUpdate > openedTabLastUpdate) ? observedTab.id : openedTab.id;
+    } else {
+        if (observedTabLastUpdate === null) return openedTab.id;
+        if (openedTabLastUpdate === null) return observedTab.id;
+        return (observedTabLastUpdate < openedTabLastUpdate) ? observedTab.id : openedTab.id;
+    }
 };
 
 const getFocusedTab = (observedTab, openedTab, activeWindowId, retainedTabId) => {
@@ -491,10 +573,12 @@ const closeDuplicateTab = async (tabToCloseId, remainingTabInfo) => {
 
 const _handleRemainingTab = async (details) => {
     if (!tabsInfo.hasTab(details.tabId)) return;
-    if (!details.observedTabClosed) return;
-
-    if (details.tabIndex > 0) moveTab(details.tabId, { index: details.tabIndex });
-    if (details.active) activateTab(details.tabId);
+    if (options.defaultTabBehavior && details.observedTabClosed) {
+        if (details.tabIndex > 0) moveTab(details.tabId, { index: details.tabIndex });
+        if (details.active) activateTab(details.tabId);
+    } else if (options.activateKeptTab) {
+        focusTab(details.tabId, details.windowId);
+    }
 };
 
 const handleRemainingTab = debounce(_handleRemainingTab, 500);
@@ -567,6 +651,42 @@ const searchForDuplicateTabs = async (windowId, closeTabs) => {
 
 // eslint-disable-next-line no-unused-vars
 const closeDuplicateTabs = (windowId) => searchForDuplicateTabs(windowId, true);
+
+const getContextMenusApi = () => {
+    if (chrome.contextMenus) return chrome.contextMenus;
+    if (typeof browser !== "undefined" && browser.contextMenus) return browser.contextMenus;
+    return null;
+};
+
+const createContextMenus = () => {
+    const contextMenus = getContextMenusApi();
+    if (!contextMenus) return;
+    contextMenus.removeAll(() => {
+        const title = chrome.i18n.getMessage("contextMenuCloseDuplicates") || "Duplicate Tab Closer";
+        const contexts = ["action"];
+        try {
+            contextMenus.create({
+                id: CONTEXT_MENU_CLOSE_DUPLICATES_ID,
+                title: title,
+                contexts: contexts
+            });
+        } catch (error) {
+            console.error("createContextMenus error:", error);
+        }
+    });
+};
+
+const handleContextMenuClick = async (info, tab) => {
+    if (info.menuItemId !== CONTEXT_MENU_CLOSE_DUPLICATES_ID) return;
+    let windowId = typeof info.windowId !== "undefined" ? info.windowId : undefined;
+    if (typeof windowId === "undefined" && tab && typeof tab.windowId !== "undefined") {
+        windowId = tab.windowId;
+    }
+    if (typeof windowId === "undefined") {
+        windowId = await getActiveWindowId();
+    }
+    closeDuplicateTabs(windowId);
+};
 
 const setDuplicateTabPanel = async (duplicateTab, duplicateTabs) => {
     let containerColor = "";
@@ -649,57 +769,61 @@ const handleMessage = (message, sender, response) => {
     }
 };
 
-chrome.runtime.onMessage.addListener(handleMessage);"use strict";
+chrome.runtime.onMessage.addListener(handleMessage);
+
+const contextMenusApi = getContextMenusApi();
+if (contextMenusApi) contextMenusApi.onClicked.addListener(handleContextMenuClick);
+"use strict";
 
 const onCreatedTab = (tab) => {
 	tabsInfo.setNewTab(tab.id);
-        if (tab.status === "complete" && !isBlankURL(tab.url)) {
-                searchForDuplicateTabsToClose(tab, true);
-        }
+	if (tab.status === "complete" && !isBlankURL(tab.url)) {
+		options.autoCloseTab ? searchForDuplicateTabsToClose(tab, true) : refreshDuplicateTabsInfo(tab.windowId);
+	}
 };
 
 const onBeforeNavigate = async (details) => {
-        if ((details.frameId == 0) && (details.tabId !== -1) && !isBlankURL(details.url)) {
-                if (tabsInfo.isIgnoredTab(details.tabId)) return;
-                const tab = await getTab(details.tabId);
-                if (tab) {
-                        tabsInfo.resetTab(tab.id);
-                        searchForDuplicateTabsToClose(tab, true, details.url);
-                }
-        }
+	if (options.autoCloseTab && (details.frameId == 0) && (details.tabId !== -1) && !isBlankURL(details.url)) {
+		if (tabsInfo.isIgnoredTab(details.tabId)) return;
+		const tab = await getTab(details.tabId);
+		if (tab) {
+			tabsInfo.resetTab(tab.id);
+			searchForDuplicateTabsToClose(tab, true, details.url);
+		}
+	}
 };
 
 const onCompletedTab = async (details) => {
-        if ((details.frameId == 0) && (details.tabId !== -1)) {
-                if (tabsInfo.isIgnoredTab(details.tabId)) return;
-                const tab = await getTab(details.tabId);
-                if (tab) {
-                        tabsInfo.updateTab(tab);
-                        searchForDuplicateTabsToClose(tab);
-                }
-        }
+	if ((details.frameId == 0) && (details.tabId !== -1)) {
+		if (tabsInfo.isIgnoredTab(details.tabId)) return;
+		const tab = await getTab(details.tabId);
+		if (tab) {
+			tabsInfo.updateTab(tab);
+			options.autoCloseTab ? searchForDuplicateTabsToClose(tab) : refreshDuplicateTabsInfo(tab.windowId);
+		}
+	}
 };
 
 const onUpdatedTab = (tabId, changeInfo, tab) => {
 	if (tabsInfo.isIgnoredTab(tabId)) return;
 	if (Object.prototype.hasOwnProperty.call(changeInfo, "status") && changeInfo.status === "complete") {
 		if (Object.prototype.hasOwnProperty.call(changeInfo, "url") && (changeInfo.url !== tab.url)) {
-                        if (isBlankURL(tab.url) || !tab.favIconUrl || !tabsInfo.hasUrlChanged(tab)) return;
-                        tabsInfo.updateTab(tab);
-                        searchForDuplicateTabsToClose(tab);
-                }
-                else if (isChromeURL(tab.url)) {
-                        tabsInfo.updateTab(tab);
-                        searchForDuplicateTabsToClose(tab);
-                }
-        }
+			if (isBlankURL(tab.url) || !tab.favIconUrl || !tabsInfo.hasUrlChanged(tab)) return;
+			tabsInfo.updateTab(tab);
+			options.autoCloseTab ? searchForDuplicateTabsToClose(tab) : refreshDuplicateTabsInfo(tab.windowId);
+		}
+		else if (isChromeURL(tab.url)) {
+			tabsInfo.updateTab(tab);
+			options.autoCloseTab ? searchForDuplicateTabsToClose(tab) : refreshDuplicateTabsInfo(tab.windowId);
+		}
+	}
 };
 
 const onAttached = async (tabId) => {
-        const tab = await getTab(tabId);
-        if (tab) {
-                searchForDuplicateTabsToClose(tab);
-        }
+	const tab = await getTab(tabId);
+	if (tab) {
+		options.autoCloseTab ? searchForDuplicateTabsToClose(tab) : refreshDuplicateTabsInfo(tab.windowId);
+	}
 };
 
 const onRemovedTab = (removedTabId, removeInfo) => {
@@ -728,6 +852,7 @@ const start = async () => {
         await initializeOptions();
         setBadgeIcon();
         await refreshGlobalDuplicateTabsInfo();
+        createContextMenus();
         chrome.tabs.onCreated.addListener(onCreatedTab);
         chrome.webNavigation.onBeforeNavigate.addListener(onBeforeNavigate);
         chrome.tabs.onAttached.addListener(onAttached);
