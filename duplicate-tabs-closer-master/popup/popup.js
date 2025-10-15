@@ -5,12 +5,6 @@ let lastDuplicateTabs = {};
 let closePopup = false;
 let environment = "";
 
-/* Show/Hide the AutoClose option */
-const changeAutoCloseOptionState = (state, resize) => {
-    $("#onRemainingTabGroup").toggleClass("hidden", state !== "A");
-    if (resize) resizeDuplicateTabsPanel();
-};
-
 const toggleShrunkMode = (checked) => {
     $(".list-group-form").toggleClass("shrunk", checked);
 };
@@ -107,7 +101,6 @@ const setPanelOptions = async () => {
             // combobox
             else {
                 $(`#${storedOption} option[value='${value}']`).prop("selected", true);
-                if (storedOption === "onDuplicateTabDetected") changeAutoCloseOptionState(value, false);
             }
             if (isLockedKey) $(`#${storedOption}`).prop("disabled", true);
         }
@@ -144,7 +137,6 @@ const loadListenerEvents = () => {
         event.stopPropagation();
         const refresh = this.id === "scope";
         saveOption(this.id, this.value, refresh);
-        if (this.id === "onDuplicateTabDetected") changeAutoCloseOptionState(this.value, true);
     });
 
     /* Open Option tab */

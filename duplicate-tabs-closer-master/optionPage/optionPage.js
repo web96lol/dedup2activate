@@ -81,7 +81,6 @@ const cleanUpWhiteList = (whiteList) => {
 
 /* Show/Hide the AutoClose option */
 const changeAutoCloseOptionState = (state, resize) => {
-  $("#onRemainingTabGroup").toggleClass("hidden", state !== "A");
   $("#whiteListGroup").toggleClass("hidden", state !== "A");
   if (resize) resizeDuplicateTabsPanel();
 };
