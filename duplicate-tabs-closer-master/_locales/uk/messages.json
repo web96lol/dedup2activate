@@ -15,6 +15,10 @@
     "message": "Закрити вкладку автоматично",
     "description": "Close tab automatically"
   },
+  "contextMenuCloseDuplicates": {
+    "message": "Закрити дублікати вкладок",
+    "description": "Context menu item that closes duplicate tabs"
+  },
   "showPanel": {
     "message": "Показати панель",
     "description": "Show panel"

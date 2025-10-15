@@ -15,6 +15,10 @@
     "message": "Fermer l'onglet automatiquement",
     "description": "Close tab automatically"
   },
+  "contextMenuCloseDuplicates": {
+    "message": "Fermer les onglets dupliqués",
+    "description": "Context menu item that closes duplicate tabs"
+  },
   "showPanel": {
     "message": "Afficher le panneau",
     "description": "Show panel"

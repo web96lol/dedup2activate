@@ -15,6 +15,10 @@
     "message": "自動的にタブを閉じる",
     "description": "Close tab automatically"
   },
+  "contextMenuCloseDuplicates": {
+    "message": "重複タブを閉じる",
+    "description": "Context menu item that closes duplicate tabs"
+  },
   "showPanel": {
     "message": "パネルを表示する",
     "description": "Show panel"

@@ -6,6 +6,7 @@ deDup2Activate detects and closes duplicate tabs.
 * Use the WebExtensions API
 * Support [Firefox](https://addons.mozilla.org/en-US/firefox/addon/duplicate-tabs-closer) and [Chrome](https://chrome.google.com/webstore/detail/duplicate-tabs-closer/gnmdbogfankgjepgglmmfmbnimcmcjle)
 * Firefox Container Tab feature is supported.
+* Includes a toolbar context menu item **Duplicate Tab Closer** to trigger a manual duplicate sweep.
 
 ## Options:
 

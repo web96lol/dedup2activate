@@ -85,7 +85,10 @@ class TabsInfo {
 }
 
 // eslint-disable-next-line no-unused-vars
-const tabsInfo = new TabsInfo();"use strict";
+const tabsInfo = new TabsInfo();
+
+const CONTEXT_MENU_CLOSE_DUPLICATES_ID = "close-duplicate-tabs";
+"use strict";
 
 const defaultOptions = {
     shrunkMode: {
@@ -649,6 +652,42 @@ const searchForDuplicateTabs = async (windowId, closeTabs) => {
 // eslint-disable-next-line no-unused-vars
 const closeDuplicateTabs = (windowId) => searchForDuplicateTabs(windowId, true);
 
+const getContextMenusApi = () => {
+    if (chrome.contextMenus) return chrome.contextMenus;
+    if (typeof browser !== "undefined" && browser.contextMenus) return browser.contextMenus;
+    return null;
+};
+
+const createContextMenus = () => {
+    const contextMenus = getContextMenusApi();
+    if (!contextMenus) return;
+    contextMenus.removeAll(() => {
+        const title = chrome.i18n.getMessage("contextMenuCloseDuplicates") || "Duplicate Tab Closer";
+        const contexts = ["action"];
+        try {
+            contextMenus.create({
+                id: CONTEXT_MENU_CLOSE_DUPLICATES_ID,
+                title: title,
+                contexts: contexts
+            });
+        } catch (error) {
+            console.error("createContextMenus error:", error);
+        }
+    });
+};
+
+const handleContextMenuClick = async (info, tab) => {
+    if (info.menuItemId !== CONTEXT_MENU_CLOSE_DUPLICATES_ID) return;
+    let windowId = typeof info.windowId !== "undefined" ? info.windowId : undefined;
+    if (typeof windowId === "undefined" && tab && typeof tab.windowId !== "undefined") {
+        windowId = tab.windowId;
+    }
+    if (typeof windowId === "undefined") {
+        windowId = await getActiveWindowId();
+    }
+    closeDuplicateTabs(windowId);
+};
+
 const setDuplicateTabPanel = async (duplicateTab, duplicateTabs) => {
     let containerColor = "";
     if (environment.isFirefox && (!duplicateTab.incognito && duplicateTab.cookieStoreId !== "firefox-default")) {
@@ -730,7 +769,11 @@ const handleMessage = (message, sender, response) => {
     }
 };
 
-chrome.runtime.onMessage.addListener(handleMessage);"use strict";
+chrome.runtime.onMessage.addListener(handleMessage);
+
+const contextMenusApi = getContextMenusApi();
+if (contextMenusApi) contextMenusApi.onClicked.addListener(handleContextMenuClick);
+"use strict";
 
 const onCreatedTab = (tab) => {
 	tabsInfo.setNewTab(tab.id);
@@ -809,6 +852,7 @@ const start = async () => {
         await initializeOptions();
         setBadgeIcon();
         await refreshGlobalDuplicateTabsInfo();
+        createContextMenus();
         chrome.tabs.onCreated.addListener(onCreatedTab);
         chrome.webNavigation.onBeforeNavigate.addListener(onBeforeNavigate);
         chrome.tabs.onAttached.addListener(onAttached);

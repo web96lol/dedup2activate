@@ -19,6 +19,11 @@
         "description": "Close tab automatically",
         "hash": "6096376eef1def5290ffc9e691152903"
     },
+    "contextMenuCloseDuplicates": {
+        "message": "关闭重复标签页",
+        "description": "Context menu item that closes duplicate tabs",
+        "hash": "1f2e3d4c5b6a79808796a5b4c3d2e1f0"
+    },
     "showPanel": {
         "message": "显示面板",
         "description": "Show panel",
