@@ -3,17 +3,13 @@
     "message": "オプション",
     "description": "Options"
   },
-  "onDuplicateTabDetected": {
-    "message": "タブの重複を検知したとき",
-    "description": "On duplicate tab detected"
+  "automaticHandling": {
+    "message": "重複タブの自動処理",
+    "description": "Section title for automatic duplicate handling"
   },
-  "doNothing": {
-    "message": "何もしない",
-    "description": "Do nothing"
-  },
-  "autoCloseTab": {
-    "message": "自動的にタブを閉じる",
-    "description": "Close tab automatically"
+  "automaticHandlingDescription": {
+    "message": "重複したタブは自動的に閉じられます。特定の URL を保持したい場合はホワイトリストを利用してください。",
+    "description": "Explains automatic closing and whitelist usage."
   },
   "showPanel": {
     "message": "パネルを表示する",

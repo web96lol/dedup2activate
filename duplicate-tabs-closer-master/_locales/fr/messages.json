@@ -3,17 +3,13 @@
     "message": "Options",
     "description": "Options"
   },
-  "onDuplicateTabDetected": {
-    "message": "À la détection d'un doublon",
-    "description": "On duplicate tab detected"
+  "automaticHandling": {
+    "message": "Gestion automatique des doublons",
+    "description": "Titre pour la gestion automatique des doublons"
   },
-  "doNothing": {
-    "message": "Ne rien faire",
-    "description": "Do nothing"
-  },
-  "autoCloseTab": {
-    "message": "Fermer l'onglet automatiquement",
-    "description": "Close tab automatically"
+  "automaticHandlingDescription": {
+    "message": "Les onglets en double se ferment automatiquement. Utilisez la liste blanche pour garder certaines URL ouvertes.",
+    "description": "Explique la fermeture automatique et la liste blanche."
   },
   "showPanel": {
     "message": "Afficher le panneau",

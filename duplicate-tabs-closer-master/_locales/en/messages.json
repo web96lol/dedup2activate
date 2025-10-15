@@ -3,17 +3,13 @@
     "message": "Options",
     "description": "Options"
   },
-  "onDuplicateTabDetected": {
-    "message": "On duplicate tab detected",
-    "description": "On duplicate tab detected"
+  "automaticHandling": {
+    "message": "Automatic duplicate handling",
+    "description": "Section title for automatic duplicate handling"
   },
-  "doNothing": {
-    "message": "Do nothing",
-    "description": "Do nothing"
-  },
-  "autoCloseTab": {
-    "message": "Close tab automatically",
-    "description": "Close tab automatically"
+  "automaticHandlingDescription": {
+    "message": "Duplicate tabs close automatically. Use the whitelist to keep specific URLs open.",
+    "description": "Explains that duplicates are always closed and how to use the whitelist."
   },
   "showPanel": {
     "message": "Show panel",

@@ -4,20 +4,13 @@
         "description": "Options",
         "hash": "531dad0078a72193602b18495f0ad4e9"
     },
-    "onDuplicateTabDetected": {
-        "message": "检测到重复标签页时",
-        "description": "On duplicate tab detected",
-        "hash": "4193a78ce76ecf58828768b4c6fabc7f"
+    "automaticHandling": {
+        "message": "重复标签的自动处理",
+        "description": "Section title for automatic duplicate handling"
     },
-    "doNothing": {
-        "message": "无操作",
-        "description": "Do nothing",
-        "hash": "a0a28b9a09a44d3e69599b6500e47a0e"
-    },
-    "autoCloseTab": {
-        "message": "自动关闭标签页",
-        "description": "Close tab automatically",
-        "hash": "6096376eef1def5290ffc9e691152903"
+    "automaticHandlingDescription": {
+        "message": "重复的标签页会自动关闭。如需保留特定网址，请将其加入白名单。",
+        "description": "Explains automatic closing and whitelist usage."
     },
     "showPanel": {
         "message": "显示面板",

@@ -9,19 +9,13 @@ deDup2Activate detects and closes duplicate tabs.
 
 ## Options:
 
-### On duplicate tab detected:
+### Automatic duplicate handling
 
-* **Close tab automatically** *(default)*: automatically closes the detected duplicate tab.
-* **Do nothing**: monitor tabs and update the badge icon to indicate the number of duplicate tabs detected.
-
-#### Whitelist:
-(Used with option *Close tab automatically*)
-List of urls to not close automatically. Duplicate tabs skipped will be notified in badge.
-Wildcards and RegExp are supported.
+Duplicate tabs are always closed automatically. Use the whitelist to keep specific URLs open. Wildcards and RegExp are supported, and skipped duplicates are still reflected in the badge count.
 
 
 ### Duplicate resolution behavior
-(Used with option *Close tab automatically* and the *Close all duplicate tabs* button)
+(Used when the extension closes duplicates automatically or when you use the *Close all duplicate tabs* button)
 The extension always keeps pinned tabs, prefers the HTTPS version of a page, and retains the older tab when deciding which duplicate to close. These rules are now built-in and no longer configurable.
 
 

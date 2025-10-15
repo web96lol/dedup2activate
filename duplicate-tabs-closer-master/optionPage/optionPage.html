@@ -23,18 +23,15 @@
       <div class="card-body shadow-sm">
         <ul class="list-group list-group-flush">
           <li class="list-group-item list-group-item-header d-flex justify-content-between align-items-center">
-            <span class="list-group-item-title list-group-expanded" i18n-content="onDuplicateTabDetected" id="onDuplicateTabDetectedTitle"></span>
-            <input type="checkbox" class="checkbox-fa" id="onDuplicateTabDetectedPinned" />
-            <label for="onDuplicateTabDetectedPinned" class="checkbox-fa-label">
+            <span class="list-group-item-title list-group-expanded" i18n-content="automaticHandling" id="automaticHandlingTitle"></span>
+            <input type="checkbox" class="checkbox-fa" id="automaticHandlingPinned" />
+            <label for="automaticHandlingPinned" class="checkbox-fa-label">
               <span class="fa fa-thumb-tack"></span>
             </label>
           </li>
           <li class="list-group-item">
-            <div class="form-group" id="onDuplicateTabDetectedBody">
-              <select class="form-control form-control-xs" id="onDuplicateTabDetected" name="onDuplicateTabDetected">
-                <option value="N" i18n-content="doNothing"></option>
-                <option value="A" i18n-content="autoCloseTab"></option>
-              </select>
+            <div class="form-group" id="automaticHandlingBody">
+              <p class="mb-2" i18n-content="automaticHandlingDescription"></p>
               <div id="whiteListGroup">
                 <label class="titleLabel" for="whiteList" i18n-content="whiteList"></label>
                 <textarea class="form-control rounded-0" rows="4" cols="100" id="whiteList"></textarea>

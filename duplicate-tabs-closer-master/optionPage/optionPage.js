@@ -24,7 +24,6 @@ const loadPopupEvents = () => {
     event.stopPropagation();
     const refresh = this.id === "scope";
     saveOption(this.id, this.value, refresh);
-    if (this.id === "onDuplicateTabDetected") changeAutoCloseOptionState(this.value, true);
   });
 
   /* Save badge color settings */
@@ -77,12 +76,6 @@ const cleanUpWhiteList = (whiteList) => {
     if (whiteListLine.length !== 0) whiteListCleaned.add(whiteListLine);
   }
   return Array.from(whiteListCleaned).join("\n");
-};
-
-/* Show/Hide the AutoClose option */
-const changeAutoCloseOptionState = (state, resize) => {
-  $("#whiteListGroup").toggleClass("hidden", state !== "A");
-  if (resize) resizeDuplicateTabsPanel();
 };
 
 const toggleExpendGroup = (groupId, checkbox, resize) => {
@@ -171,7 +164,6 @@ const setPanelOption = (details) => {
     }
     else {
       $(`#${storedOption} option[value='${value}']`).prop("selected", true);
-      if (storedOption === "onDuplicateTabDetected") changeAutoCloseOptionState(value, resize);
     }
     if (isLockedKey) $(`#${storedOption}`).prop("disabled", true);
   }

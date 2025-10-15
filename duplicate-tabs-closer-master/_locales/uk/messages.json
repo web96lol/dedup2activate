@@ -3,17 +3,13 @@
     "message": "Опції",
     "description": "Options"
   },
-  "onDuplicateTabDetected": {
-    "message": "Якщо виявлено дублікат вкладки",
-    "description": "On duplicate tab detected"
+  "automaticHandling": {
+    "message": "Автоматична обробка дублікатів",
+    "description": "Заголовок розділу для автоматичної обробки дублікатів"
   },
-  "doNothing": {
-    "message": "Нічого не робити",
-    "description": "Do nothing"
-  },
-  "autoCloseTab": {
-    "message": "Закрити вкладку автоматично",
-    "description": "Close tab automatically"
+  "automaticHandlingDescription": {
+    "message": "Дублікати вкладок закриваються автоматично. Використовуйте білий список, щоб залишити потрібні URL відкритими.",
+    "description": "Пояснення про автоматичне закриття та білий список."
   },
   "showPanel": {
     "message": "Показати панель",

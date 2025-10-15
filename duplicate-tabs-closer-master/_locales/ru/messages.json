@@ -3,17 +3,13 @@
     "message": "Параметры",
     "description": "Options"
   },
-  "onDuplicateTabDetected": {
-    "message": "Если обнаружен дубликат вкладки",
-    "description": "On duplicate tab detected"
+  "automaticHandling": {
+    "message": "Автоматическая обработка дубликатов",
+    "description": "Заголовок раздела для автоматического удаления дубликатов"
   },
-  "doNothing": {
-    "message": "Ничего не делать",
-    "description": "Do nothing"
-  },
-  "autoCloseTab": {
-    "message": "Закрыть вкладку автоматически",
-    "description": "Close tab automatically"
+  "automaticHandlingDescription": {
+    "message": "Дубликаты вкладок закрываются автоматически. Используйте белый список, чтобы оставить нужные URL открытыми.",
+    "description": "Пояснение про автоматическое закрытие и белый список."
   },
   "showPanel": {
     "message": "Показать панель",
