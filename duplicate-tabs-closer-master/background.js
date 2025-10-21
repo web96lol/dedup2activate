@@ -1,5 +1,117 @@
 "use strict";
 
+const HTTPS_PATTERN = /^https:\/\//i;
+const VALID_URL_PATTERN = /^(f|ht)tps?:\/\//i;
+
+const detectEnvironment = (platformInfo = {}, hasInstallTrigger = false) => {
+    if (platformInfo.os === "android") return "android";
+    return hasInstallTrigger ? "firefox" : "chrome";
+};
+
+const isValidUrl = (url) => typeof url === "string" && VALID_URL_PATTERN.test(url);
+
+const isBrowserUrl = (url) => typeof url === "string" && (url.startsWith("about:") || url.startsWith("chrome://"));
+
+const isHttpsUrl = (url) => typeof url === "string" && HTTPS_PATTERN.test(url);
+
+const normalizeUrl = (url) => {
+    if (!isValidUrl(url)) return url;
+    const uri = new URL(url);
+    const host = uri.host.toLowerCase();
+    const normalizedHost = host.startsWith("www.") ? host.slice(4) : host;
+    const normalizedUrl = `https://${normalizedHost}${uri.pathname}${uri.search}${uri.hash}`.replace(/\/$/, "");
+    return normalizedUrl.toLowerCase();
+};
+
+const buildMatchPattern = (url) => {
+    if (isValidUrl(url)) {
+        const normalizedUrl = normalizeUrl(url);
+        const uri = new URL(normalizedUrl);
+        const hostname = uri.hostname.toLowerCase();
+        const port = uri.port ? `:${uri.port}` : "";
+        const hostVariants = new Set([hostname]);
+        if (hostname.startsWith("www.")) {
+            hostVariants.add(hostname.slice(4));
+        } else {
+            const dotCount = (hostname.match(/\./g) || []).length;
+            if (dotCount === 1) hostVariants.add(`www.${hostname}`);
+        }
+        const patterns = Array.from(hostVariants).map(hostVariant => `*://${hostVariant}${port}/*`);
+        return patterns.length === 1 ? patterns[0] : patterns;
+    }
+    if (isBrowserUrl(url)) {
+        return `${url}*`;
+    }
+    return url;
+};
+
+const chooseByPinned = (observedTab, candidateTab, keepPinnedTab) => {
+    if (!keepPinnedTab || observedTab.pinned === candidateTab.pinned) return null;
+    return observedTab.pinned ? observedTab.id : candidateTab.id;
+};
+
+const chooseByHttps = (observedUrl, candidateUrl, observedTab, candidateTab, keepTabWithHttps) => {
+    if (!keepTabWithHttps) return null;
+    const observedHttps = isHttpsUrl(observedUrl);
+    const candidateHttps = isHttpsUrl(candidateUrl);
+    if (observedHttps === candidateHttps) return null;
+    return observedHttps ? observedTab.id : candidateTab.id;
+};
+
+const chooseByRecency = (observedLastComplete, candidateLastComplete, observedTab, candidateTab, keepNewerTab) => {
+    const observedMissing = observedLastComplete === null || typeof observedLastComplete === "undefined";
+    const candidateMissing = candidateLastComplete === null || typeof candidateLastComplete === "undefined";
+    if (keepNewerTab) {
+        if (observedMissing) return observedTab.id;
+        if (candidateMissing) return candidateTab.id;
+        return observedLastComplete > candidateLastComplete ? observedTab.id : candidateTab.id;
+    }
+    if (observedMissing) return candidateTab.id;
+    if (candidateMissing) return observedTab.id;
+    return observedLastComplete < candidateLastComplete ? observedTab.id : candidateTab.id;
+};
+
+const chooseByFocus = (observedTab, candidateTab, activeWindowId, currentRetainedId) => {
+    if (!activeWindowId) return currentRetainedId;
+    const candidateInActiveWindow = candidateTab.windowId === activeWindowId;
+    const observedInActiveWindow = observedTab.windowId === activeWindowId;
+
+    if (currentRetainedId === observedTab.id) {
+        if (candidateInActiveWindow && (candidateTab.active || !observedInActiveWindow)) {
+            return candidateTab.id;
+        }
+        return observedTab.id;
+    }
+
+    if (observedInActiveWindow && (observedTab.active || !candidateInActiveWindow)) {
+        return observedTab.id;
+    }
+    return candidateTab.id;
+};
+
+const determineRetainedTabId = ({
+    observedTab,
+    observedTabUrl,
+    candidateTab,
+    candidateUrl,
+    observedTabLastComplete,
+    candidateLastComplete,
+    activeWindowId,
+    keepPinnedTab,
+    keepTabWithHttps,
+    keepNewerTab
+}) => {
+    let retainedTabId = chooseByPinned(observedTab, candidateTab, keepPinnedTab);
+    if (!retainedTabId) {
+        retainedTabId = chooseByHttps(observedTabUrl ?? observedTab.url, candidateUrl ?? candidateTab.url, observedTab, candidateTab, keepTabWithHttps);
+        if (!retainedTabId) {
+            retainedTabId = chooseByRecency(observedTabLastComplete, candidateLastComplete, observedTab, candidateTab, keepNewerTab);
+            retainedTabId = chooseByFocus(observedTab, candidateTab, activeWindowId, retainedTabId);
+        }
+    }
+    return retainedTabId;
+};
+
 class TabsInfo {
 
     constructor() {
@@ -177,7 +289,7 @@ const setupDefaultOptions = async () => {
 
 const getEnvironment = async () => {
     const info = await getPlatformInfo();
-    const environment = (info.os === "android") ? "android" : (typeof InstallTrigger !== "undefined") ? "firefox" : "chrome";
+    const environment = detectEnvironment(info, typeof InstallTrigger !== "undefined");
     return environment;
 };
 
@@ -298,22 +410,13 @@ const isBlankURL = (url) => url === "about:blank";
 // eslint-disable-next-line no-unused-vars
 const isChromeURL = (url) => url.startsWith("chrome://") || url.startsWith("view-source:chrome-search");
 
-const isBrowserURL = (url) => url.startsWith("about:") || url.startsWith("chrome://");
+const isBrowserURL = (url) => isBrowserUrl(url);
 
-const isValidURL = (url) => {
-	const regex = /^(f|ht)tps?:\/\//i;
-	return regex.test(url);
-};
+const isValidURL = (url) => isValidUrl(url);
 
 // eslint-disable-next-line no-unused-vars
-const isHttps = (url) => {
-	const regex = /^https:\/\//i;
-	return regex.test(url);
-};
-
-// eslint-disable-next-line no-unused-vars
-const getMatchingURL = (url) => {	
-	if (!isValidURL(url)) return url;
+const getMatchingURL = (url) => {
+	if (!isValidUrl(url)) return url;
 	let matchingURL = url;
 	if (options.ignorePathPart) {
 		const uri = new URL(matchingURL);
@@ -340,25 +443,22 @@ const getMatchingURL = (url) => {
 
 // eslint-disable-next-line no-unused-vars
 const getMatchPatternURL = (url) => {
-	let urlPattern = null;
-	if (isValidURL(url)) {
-		const uri = new URL(url);
-		urlPattern = `*://${uri.hostname}`;
-		if (options.ignorePathPart) {
-			urlPattern += "/*";
-		}
-		else {
-			urlPattern += uri.pathname;
-			if (uri.search || uri.hash) {
-				urlPattern += "*";
-			}
-		}
+	const pattern = buildMatchPattern(url);
+	if (!isValidUrl(url) || options.ignorePathPart) {
+		return pattern;
 	}
-	else if (isBrowserURL(url)) {
-		urlPattern = `${url}*`;
-	}
-
-	return urlPattern;
+	const uri = new URL(url);
+	const applyPath = (entry) => {
+		if (typeof entry !== "string") return entry;
+		const wildcardIndex = entry.indexOf("/*");
+		if (wildcardIndex === -1) return entry;
+		let updatedPattern = `${entry.slice(0, wildcardIndex)}${uri.pathname}`;
+		if (uri.search || uri.hash) {
+			updatedPattern += "*";
+		}
+		return updatedPattern;
+	};
+	return Array.isArray(pattern) ? pattern.map(applyPath) : applyPath(pattern);
 };"use strict";
 
 // eslint-disable-next-line no-unused-vars
@@ -430,71 +530,23 @@ const matchTitle = (tab1, tab2) => {
     return false;
 };
 
-const getHttpsTabId = (observedTab, observedTabUrl, openedTab) => {
-    if (options.keepTabWithHttps) {
-        const regex = /^https:\/\//i;
-        const match1 = regex.test(observedTabUrl);
-        const match2 = regex.test(openedTab.url);
-        if (match1) {
-            return match2 ? null : observedTab.id;
-        } else {
-            return match2 ? openedTab.id : null;
-        }
-    }
-    return null;
-};
-
-const getPinnedTabId = (tab1, tab2) => {
-    if (options.keepPinnedTab) {
-        if (tab1.pinned) {
-            return tab2.pinned ? null : tab1.id;
-        } else {
-            return tab2.pinned ? tab2.id : null;
-        }
-    }
-    return null;
-};
-
-const getLastUpdatedTabId = (observedTab, openedTab) => {
-    const observedTabLastUpdate = tabsInfo.getLastComplete(observedTab.id);
-    const openedTabLastUpdate = tabsInfo.getLastComplete(openedTab.id);
-    if (options.keepNewerTab) {
-        if (observedTabLastUpdate === null) return observedTab.id;
-        if (openedTabLastUpdate === null) return openedTab.id;
-        return (observedTabLastUpdate > openedTabLastUpdate) ? observedTab.id : openedTab.id;
-    } else {
-        if (observedTabLastUpdate === null) return openedTab.id;
-        if (openedTabLastUpdate === null) return observedTab.id;
-        return (observedTabLastUpdate < openedTabLastUpdate) ? observedTab.id : openedTab.id;
-    }
-};
-
-const getFocusedTab = (observedTab, openedTab, activeWindowId, retainedTabId) => {
-    if (retainedTabId === observedTab.id) {
-        return ((openedTab.windowId === activeWindowId) && (openedTab.active || (observedTab.windowId !== activeWindowId)) ? openedTab.id : observedTab.id);
-    }
-    else {
-        return ((observedTab.windowId === activeWindowId) && (observedTab.active || (openedTab.windowId !== activeWindowId)) ? observedTab.id : openedTab.id);
-    }
-};
-
-
 const getCloseInfo = (details) => {
     const observedTab = details.observedTab;
-    const observedTabUrl = details.observedTabUrl || observedTab.url;
     const openedTab = details.openedTab;
     const activeWindowId = details.activeWindowId;
-    let retainedTabId = getPinnedTabId(observedTab, openedTab);
-    if (!retainedTabId) {
-        retainedTabId = getHttpsTabId(observedTab, observedTabUrl, openedTab);
-        if (!retainedTabId) {
-            retainedTabId = getLastUpdatedTabId(observedTab, openedTab);
-            if (activeWindowId) {
-                retainedTabId = getFocusedTab(observedTab, openedTab, activeWindowId, retainedTabId);
-            }
-        }
-    }
-    if (retainedTabId == observedTab.id) {
+    const retainedTabId = determineRetainedTabId({
+        observedTab: observedTab,
+        observedTabUrl: details.observedTabUrl,
+        candidateTab: openedTab,
+        candidateUrl: openedTab.url,
+        observedTabLastComplete: tabsInfo.getLastComplete(observedTab.id),
+        candidateLastComplete: tabsInfo.getLastComplete(openedTab.id),
+        activeWindowId: activeWindowId,
+        keepPinnedTab: options.keepPinnedTab,
+        keepTabWithHttps: options.keepTabWithHttps,
+        keepNewerTab: options.keepNewerTab
+    });
+    if (retainedTabId === observedTab.id) {
         const keepInfo = {
             observedTabClosed: false,
             active: openedTab.active,
