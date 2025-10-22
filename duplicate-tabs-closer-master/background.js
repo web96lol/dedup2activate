@@ -2,8 +2,6 @@
 
 const HTTPS_PATTERN = /^https:\/\//i;
 const VALID_URL_PATTERN = /^(f|ht)tps?:\/\//i;
-const BADGE_PRIMARY_COLOR = "#df73ff";
-const BADGE_TEXT_COLOR = "#ffffff";
 
 const detectEnvironment = (platformInfo = {}, hasInstallTrigger = false) => {
     if (platformInfo.os === "android") return "android";
@@ -271,8 +269,14 @@ const defaultOptions = {
     badgeColorNoDuplicateTabs: {
         value: BADGE_PRIMARY_COLOR
     },
+    badgeColorNoDuplicateTabs: {
+        value: "#1e90ff"
+    },
     showBadgeIfNoDuplicateTabs: {
         value: true
+    },
+    closePopup: {
+        value: false
     },
     closePopup: {
         value: false
@@ -321,35 +325,16 @@ const initializeOptions = async () => {
             storedOptions = await saveStoredOptions(storedOptions, true);
         }
     }
-    if (enforceRetainedTabPreferences(storedOptions)) storedOptions = await saveStoredOptions(storedOptions);
     setOptions(storedOptions);
     setEnvironment(storedOptions);
-};
-
-const enforceRetainedTabPreferences = (storedOptions) => {
-    let updated = false;
-    if (storedOptions.keepPinnedTab && storedOptions.keepPinnedTab.value !== true) {
-        storedOptions.keepPinnedTab.value = true;
-        updated = true;
-    }
-    if (storedOptions.keepTabWithHttps && storedOptions.keepTabWithHttps.value !== true) {
-        storedOptions.keepTabWithHttps.value = true;
-        updated = true;
-    }
-    if (storedOptions.keepTabBasedOnAge && storedOptions.keepTabBasedOnAge.value !== "O") {
-        storedOptions.keepTabBasedOnAge.value = "O";
-        updated = true;
-    }
-    return updated;
 };
 
 // eslint-disable-next-line no-unused-vars
 const setStoredOption = async (name, value, refresh) => {
     const options = await getStoredOptions();
-    let storedOptions = options.storedOptions;
-    if (Object.prototype.hasOwnProperty.call(storedOptions, name)) storedOptions[name].value = value;
-    enforceRetainedTabPreferences(storedOptions);
-    storedOptions = await saveStoredOptions(storedOptions);
+    const storedOptions = options.storedOptions;
+    storedOptions[name].value = value;
+    saveStoredOptions(storedOptions);
     setOptions(storedOptions);
     if (refresh) refreshGlobalDuplicateTabsInfo();
     else if (name === "onDuplicateTabDetected") setBadgeIcon();
@@ -362,9 +347,9 @@ const setOptions = (storedOptions) => {
     options.autoCloseTab = storedOptions.onDuplicateTabDetected.value === "A";
     options.defaultTabBehavior = storedOptions.onRemainingTab.value === "B";
     options.activateKeptTab = storedOptions.onRemainingTab.value === "A";
-    options.keepNewerTab = false;
-    options.keepTabWithHttps = true;
-    options.keepPinnedTab = true;
+    options.keepNewerTab = storedOptions.keepTabBasedOnAge.value === "N";
+    options.keepTabWithHttps = storedOptions.keepTabWithHttps.value;
+    options.keepPinnedTab = storedOptions.keepPinnedTab.value;
     options.ignoreHashPart = storedOptions.ignoreHashPart.value;
     options.ignoreSearchPart = storedOptions.ignoreSearchPart.value;
     options.ignorePathPart = storedOptions.ignorePathPart.value;
@@ -374,9 +359,9 @@ const setOptions = (storedOptions) => {
     options.searchInAllWindows = storedOptions.scope.value === "A" || storedOptions.scope.value === "CA";
     options.searchPerContainer = storedOptions.scope.value === "CC" || storedOptions.scope.value === "CA";
     options.whiteList = whiteListToPattern(storedOptions.whiteList.value);
-    options.badgeColorDuplicateTabs = BADGE_PRIMARY_COLOR;
-    options.badgeColorNoDuplicateTabs = BADGE_PRIMARY_COLOR;
-    options.showBadgeIfNoDuplicateTabs = true;
+    options.badgeColorDuplicateTabs = storedOptions.badgeColorDuplicateTabs.value;
+    options.badgeColorNoDuplicateTabs = storedOptions.badgeColorNoDuplicateTabs.value;
+    options.showBadgeIfNoDuplicateTabs = storedOptions.showBadgeIfNoDuplicateTabs.value;
 };
 
 const environment = {
@@ -437,23 +422,43 @@ const isValidURL = (url) => isValidUrl(url);
 
 // eslint-disable-next-line no-unused-vars
 const getMatchingURL = (url) => {
-        if (!isValidUrl(url)) return url;
-        return normalizeUrl(url);
+	if (!isValidUrl(url)) return url;
+	let matchingURL = url;
+	if (options.ignorePathPart) {
+		const uri = new URL(matchingURL);
+		matchingURL = uri.origin;
+	}
+	else if (options.ignoreSearchPart) {
+		matchingURL = matchingURL.split("?")[0];
+	}
+	else if (options.ignoreHashPart) {
+		matchingURL = matchingURL.split("#")[0];
+	}
+	if (options.keepTabWithHttps) {
+		matchingURL = matchingURL.replace(/^http:\/\//i, "https://");
+	}
+	if (options.ignore3w) {
+		matchingURL = matchingURL.replace("://www.", "://");
+	}
+	if (options.caseInsensitive) {
+		matchingURL = matchingURL.toLowerCase();
+	}
+	matchingURL = matchingURL.replace(/\/$/, "");
+	return matchingURL;
 };
 
 // eslint-disable-next-line no-unused-vars
 const getMatchPatternURL = (url) => {
-        if (!isValidUrl(url)) {
-                return buildMatchPattern(url);
-        }
-        const normalizedUrl = normalizeUrl(url);
-        const pattern = buildMatchPattern(normalizedUrl);
-        const uri = new URL(normalizedUrl);
-        const applyPath = (entry) => {
-                if (typeof entry !== "string") return entry;
-                const wildcardIndex = entry.indexOf("/*");
-                if (wildcardIndex === -1) return entry;
-                let updatedPattern = `${entry.slice(0, wildcardIndex)}${uri.pathname}`;
+	const pattern = buildMatchPattern(url);
+	if (!isValidUrl(url) || options.ignorePathPart) {
+		return pattern;
+	}
+	const uri = new URL(url);
+	const applyPath = (entry) => {
+		if (typeof entry !== "string") return entry;
+		const wildcardIndex = entry.indexOf("/*");
+		if (wildcardIndex === -1) return entry;
+		let updatedPattern = `${entry.slice(0, wildcardIndex)}${uri.pathname}`;
 		if (uri.search || uri.hash) {
 			updatedPattern += "*";
 		}
@@ -462,38 +467,28 @@ const getMatchPatternURL = (url) => {
 	return Array.isArray(pattern) ? pattern.map(applyPath) : applyPath(pattern);
 };"use strict";
 
-const setBadgeTextColor = (color) => {
-        if (environment.isFirefox && typeof browser !== "undefined" && browser.action && typeof browser.action.setBadgeTextColor === "function") {
-                browser.action.setBadgeTextColor({ color });
-        }
-        else if (typeof chrome !== "undefined" && chrome.action && typeof chrome.action.setBadgeTextColor === "function") {
-                chrome.action.setBadgeTextColor({ color });
-        }
-};
-
 // eslint-disable-next-line no-unused-vars
 const setBadgeIcon = () => {
-        chrome.action.setIcon({ path: options.autoCloseTab ? "images/auto_close_16.png" : "images/manual_close_16.png" });
-        setBadgeTextColor(BADGE_TEXT_COLOR);
+	chrome.action.setIcon({ path: options.autoCloseTab ? "images/auto_close_16.png" : "images/manual_close_16.png" });
+	if (environment.isFirefox) browser.action.setBadgeTextColor({ color: "white" });
 };
 
 const setBadge = async (windowId, activeTabId) => {
-        const nbDuplicateTabs = tabsInfo.getNbDuplicateTabs(windowId);
-        const badgeText = nbDuplicateTabs === "0" ? "0" : nbDuplicateTabs;
-        const backgroundColor = BADGE_PRIMARY_COLOR;
-        setBadgeTextColor(BADGE_TEXT_COLOR);
-        if (environment.isFirefox) {
-                setWindowBadgeText(windowId, badgeText);
-                setWindowBadgeBackgroundColor(windowId, backgroundColor);
-        }
-        else {
-                // eslint-disable-next-line no-param-reassign
-                activeTabId = activeTabId || await getActiveTabId(windowId);
-                if (activeTabId) {
-                        setTabBadgeText(activeTabId, badgeText);
-                        setTabBadgeBackgroundColor(activeTabId, backgroundColor);
-                }
-        }
+	let nbDuplicateTabs = tabsInfo.getNbDuplicateTabs(windowId);
+	if (nbDuplicateTabs === "0" && !options.showBadgeIfNoDuplicateTabs) nbDuplicateTabs = "";
+	const backgroundColor = (nbDuplicateTabs !== "0") ? options.badgeColorDuplicateTabs : options.badgeColorNoDuplicateTabs;
+	if (environment.isFirefox) {
+		setWindowBadgeText(windowId, nbDuplicateTabs);
+		setWindowBadgeBackgroundColor(windowId, backgroundColor);
+	}
+	else {
+		// eslint-disable-next-line no-param-reassign
+		activeTabId = activeTabId || await getActiveTabId(windowId);
+		if (activeTabId) {
+			setTabBadgeText(activeTabId, nbDuplicateTabs);
+			setTabBadgeBackgroundColor(activeTabId, backgroundColor);
+		}
+	}
 };
 
 const getNbDuplicateTabs = (duplicateTabsGroups) => {
