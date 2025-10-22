@@ -54,32 +54,16 @@
                         </li>
                     </div>
                     <div class="list-group-form" id="tabPriorityGroup">
-                        <li class="list-group-item list-group-item-header d-flex justify-content-between align-items-center">
+                        <li class="list-group-item list-group-item-header">
                             <span class="list-group-item-title" i18n-content="tabPriority" id="tabPriorityTitle"></span>
-                            <input type="checkbox" class="checkbox-fa" id="tabPriorityPinned" />
-                            <label for="tabPriorityPinned" class="checkbox-fa-label">
-                                <span class="fa fa-thumb-tack"></span>
-                            </label>
                         </li>
                         <li class="list-group-item">
                             <div class="form-group" id="tabPriorityBody">
-                                <select class="form-control form-control-xs" id="keepTabBasedOnAge" name="keepTabBasedOnAge">
-                                    <option value="N" i18n-content="keepNewerTab"></option>
-                                    <option value="O" i18n-content="keepOlderTab"></option>
-                                </select>
-                                <div class="vertical-line"></div>
-                                <div class="checkboxes">
-                                    <label for="keepTabWithHttps">
-                                        <input type="checkbox" id="keepTabWithHttps" />
-                                        <span i18n-content="keepTabWithHttps"></span>
-                                    </label>
-                                </div>
-                                <div class="checkboxes">
-                                    <label for="keepPinnedTab">
-                                        <input type="checkbox" id="keepPinnedTab" />
-                                        <span i18n-content="keepPinnedTab"></span>
-                                    </label>
-                                </div>
+                                <ul class="list-unstyled mb-0">
+                                    <li><span i18n-content="keepOlderTab"></span></li>
+                                    <li><span i18n-content="keepTabWithHttps"></span></li>
+                                    <li><span i18n-content="keepPinnedTab"></span></li>
+                                </ul>
                             </div>
                         </li>
                     </div>
