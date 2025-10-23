@@ -224,21 +224,6 @@ const defaultOptions = {
     scope: {
         value: "C"
     },
-    ignoreHashPart: {
-        value: false
-    },
-    ignoreSearchPart: {
-        value: false
-    },
-    ignorePathPart: {
-        value: false
-    },
-    ignore3w: {
-        value: true
-    },
-    caseInsensitive: {
-        value: true
-    },
     compareWithTitle: {
         value: false
     },
@@ -331,7 +316,7 @@ const setStoredOption = async (name, value, refresh) => {
     saveStoredOptions(storedOptions);
     setOptions(storedOptions);
     if (refresh) refreshGlobalDuplicateTabsInfo();
-    else if (name === "onDuplicateTabDetected") setBadgeIcon();
+    else if (name === "onDuplicateTabDetected") modBadgeIcon();
     else if (name === "showBadgeIfNoDuplicateTabs" || name === "badgeColorNoDuplicateTabs" || name === "badgeColorDuplicateTabs") updateBadgeStyle();
 };
 
@@ -344,12 +329,7 @@ const setOptions = (storedOptions) => {
     options.keepNewerTab = storedOptions.keepTabBasedOnAge.value === "N";
     options.keepTabWithHttps = storedOptions.keepTabWithHttps.value;
     options.keepPinnedTab = storedOptions.keepPinnedTab.value;
-    options.ignoreHashPart = storedOptions.ignoreHashPart.value;
-    options.ignoreSearchPart = storedOptions.ignoreSearchPart.value;
-    options.ignorePathPart = storedOptions.ignorePathPart.value;
     options.compareWithTitle = storedOptions.compareWithTitle.value;
-    options.ignore3w = storedOptions.ignore3w.value;
-    options.caseInsensitive = storedOptions.caseInsensitive.value;
     options.searchInAllWindows = storedOptions.scope.value === "A" || storedOptions.scope.value === "CA";
     options.searchPerContainer = storedOptions.scope.value === "CC" || storedOptions.scope.value === "CA";
     options.whiteList = whiteListToPattern(storedOptions.whiteList.value);
@@ -418,25 +398,11 @@ const isValidURL = (url) => isValidUrl(url);
 const getMatchingURL = (url) => {
 	if (!isValidUrl(url)) return url;
 	let matchingURL = url;
-	if (options.ignorePathPart) {
-		const uri = new URL(matchingURL);
-		matchingURL = uri.origin;
-	}
-	else if (options.ignoreSearchPart) {
-		matchingURL = matchingURL.split("?")[0];
-	}
-	else if (options.ignoreHashPart) {
-		matchingURL = matchingURL.split("#")[0];
-	}
 	if (options.keepTabWithHttps) {
 		matchingURL = matchingURL.replace(/^http:\/\//i, "https://");
 	}
-	if (options.ignore3w) {
-		matchingURL = matchingURL.replace("://www.", "://");
-	}
-	if (options.caseInsensitive) {
-		matchingURL = matchingURL.toLowerCase();
-	}
+	matchingURL = matchingURL.toLowerCase();
+	matchingURL = matchingURL.replace("://www.", "://");
 	matchingURL = matchingURL.replace(/\/$/, "");
 	return matchingURL;
 };
@@ -444,7 +410,7 @@ const getMatchingURL = (url) => {
 // eslint-disable-next-line no-unused-vars
 const getMatchPatternURL = (url) => {
 	const pattern = buildMatchPattern(url);
-	if (!isValidUrl(url) || options.ignorePathPart) {
+	if (!isValidUrl(url)) {
 		return pattern;
 	}
 	const uri = new URL(url);
@@ -462,7 +428,7 @@ const getMatchPatternURL = (url) => {
 };"use strict";
 
 // eslint-disable-next-line no-unused-vars
-const setBadgeIcon = () => {
+const modBadgeIcon = () => {
 	chrome.action.setIcon({ path: options.autoCloseTab ? "images/auto_close_16.png" : "images/manual_close_16.png" });
 	if (environment.isFirefox) browser.action.setBadgeTextColor({ color: "white" });
 };
@@ -568,7 +534,7 @@ const getCloseInfo = (details) => {
 };
 
 // eslint-disable-next-line no-unused-vars
-const searchForDuplicateTabsToClose = async (observedTab, queryComplete, loadingUrl) => {
+const searchForDupeTabsToDestroy = async (observedTab, queryComplete, loadingUrl) => {
     const observedTabUrl = loadingUrl || observedTab.url;
     const observedWindowsId = observedTab.windowId;
     if (isUrlWhiteListed(observedTabUrl)) {
@@ -784,10 +750,27 @@ const handleMessage = (message, sender, response) => {
 
 chrome.runtime.onMessage.addListener(handleMessage);"use strict";
 
+const waitForRestoredTabs = async () => {
+	let previousCount = 0;
+	for (let attempt = 0; attempt < 10; attempt += 1) {
+		await wait(300);
+		const tabs = await getTabs({ windowType: "normal" }) || [];
+		if (tabs.length === previousCount) break;
+		previousCount = tabs.length;
+	}
+};
+
+const onRuntimeStartup = async () => {
+	if (!options.autoCloseTab) return;
+	await waitForRestoredTabs();
+	const windowId = options.searchInAllWindows ? null : await getActiveWindowId();
+	closeDuplicateTabs(windowId);
+};
+
 const onCreatedTab = (tab) => {
 	tabsInfo.setNewTab(tab.id);
 	if (tab.status === "complete" && !isBlankURL(tab.url)) {
-		options.autoCloseTab ? searchForDuplicateTabsToClose(tab, true) : refreshDuplicateTabsInfo(tab.windowId);
+		options.autoCloseTab ? searchForDupeTabsToDestroy(tab, true) : refreshDuplicateTabsInfo(tab.windowId);
 	}
 };
 
@@ -797,7 +780,7 @@ const onBeforeNavigate = async (details) => {
 		const tab = await getTab(details.tabId);
 		if (tab) {
 			tabsInfo.resetTab(tab.id);
-			searchForDuplicateTabsToClose(tab, true, details.url);
+			searchForDupeTabsToDestroy(tab, true, details.url);
 		}
 	}
 };
@@ -808,7 +791,7 @@ const onCompletedTab = async (details) => {
 		const tab = await getTab(details.tabId);
 		if (tab) {
 			tabsInfo.updateTab(tab);
-			options.autoCloseTab ? searchForDuplicateTabsToClose(tab) : refreshDuplicateTabsInfo(tab.windowId);
+			options.autoCloseTab ? searchForDupeTabsToDestroy(tab) : refreshDuplicateTabsInfo(tab.windowId);
 		}
 	}
 };
@@ -819,11 +802,11 @@ const onUpdatedTab = (tabId, changeInfo, tab) => {
 		if (Object.prototype.hasOwnProperty.call(changeInfo, "url") && (changeInfo.url !== tab.url)) {
 			if (isBlankURL(tab.url) || !tab.favIconUrl || !tabsInfo.hasUrlChanged(tab)) return;
 			tabsInfo.updateTab(tab);
-			options.autoCloseTab ? searchForDuplicateTabsToClose(tab) : refreshDuplicateTabsInfo(tab.windowId);
+			options.autoCloseTab ? searchForDupeTabsToDestroy(tab) : refreshDuplicateTabsInfo(tab.windowId);
 		}
 		else if (isChromeURL(tab.url)) {
 			tabsInfo.updateTab(tab);
-			options.autoCloseTab ? searchForDuplicateTabsToClose(tab) : refreshDuplicateTabsInfo(tab.windowId);
+			options.autoCloseTab ? searchForDupeTabsToDestroy(tab) : refreshDuplicateTabsInfo(tab.windowId);
 		}
 	}
 };
@@ -831,7 +814,7 @@ const onUpdatedTab = (tabId, changeInfo, tab) => {
 const onAttached = async (tabId) => {
 	const tab = await getTab(tabId);
 	if (tab) {
-		options.autoCloseTab ? searchForDuplicateTabsToClose(tab) : refreshDuplicateTabsInfo(tab.windowId);
+		options.autoCloseTab ? searchForDupeTabsToDestroy(tab) : refreshDuplicateTabsInfo(tab.windowId);
 	}
 };
 
@@ -859,7 +842,7 @@ const onActivatedTab = (activeInfo) => {
 const start = async () => {
         // eslint-disable-next-line no-unused-vars
         await initializeOptions();
-        setBadgeIcon();
+        modBadgeIcon();
         await refreshGlobalDuplicateTabsInfo();
         chrome.tabs.onCreated.addListener(onCreatedTab);
         chrome.webNavigation.onBeforeNavigate.addListener(onBeforeNavigate);
@@ -869,6 +852,8 @@ const start = async () => {
         chrome.webNavigation.onCompleted.addListener(onCompletedTab);
         chrome.tabs.onRemoved.addListener(onRemovedTab);
         if (!environment.isFirefox) chrome.tabs.onActivated.addListener(onActivatedTab);
+        chrome.runtime.onStartup.addListener(onRuntimeStartup);
 };
 
 start();
+

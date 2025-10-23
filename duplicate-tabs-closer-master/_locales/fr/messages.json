@@ -59,26 +59,6 @@
     "message": "Règle de correspondance",
     "description": "Règle de correspondance"
   },
-  "ignoreHashPart": {
-    "message": "Ignorer la partie « hachage » de l'URL",
-    "description": "Ignore hash part in URL"
-  },
-  "ignoreSearchPart": {
-    "message": "Ignorer la partie « recherche » de l'URL",
-    "description": "Ignore search part in URL"
-  },
-  "ignorePathPart": {
-    "message": "Ignorer la partie « chemin » de l'URL",
-    "description": "Ignore path part in URL"
-  },
-  "ignore3w": {
-    "message": "Ignorer 'www' dans le nom de domaine de l'URL",
-    "description": "Ignorer 'www' dans le nom de domaine de l'URL"
-  },
-  "caseInsensitive": {
-    "message": "Ignorer la casse de l'URL",
-    "description": "Ignorer la casse de l'URL"
-  },
   "compareWithTitle": {
     "message": "Comparer avec le titre",
     "description": "Compare with title"
@@ -141,18 +121,18 @@
   },
   "noDuplicateTabs": {
     "message": "Aucun onglet en doublon",
-    "description": "No duplicate tabs"    
+    "description": "No duplicate tabs"
   },
   "closePopup": {
     "message": "Fermer le panneau de popup après la fermeture des onglets en doublon",
-    "description": "Fermer le panneau de popup après la fermeture des onglets en doublon"    
+    "description": "Fermer le panneau de popup après la fermeture des onglets en doublon"
   },
   "moreOptions": {
-    "message":  "Plus d'options...",
-    "description":  "Plus d'options..."
+    "message": "Plus d'options...",
+    "description": "Plus d'options..."
   },
   "shrunkMode": {
-    "message":  "Shrunk mode:\nQuand il est activé, cache les options qui ne sont pas épinglées.",
-    "description":  "Shrunk mode\nQuand il est activé, cache les options qui ne sont pas épinglées."
-  }  
+    "message": "Shrunk mode:\nQuand il est activé, cache les options qui ne sont pas épinglées.",
+    "description": "Shrunk mode\nQuand il est activé, cache les options qui ne sont pas épinglées."
+  }
 }

@@ -35,10 +35,10 @@ module.exports = {
         "removeTab": "readonly",
         "requestDuplicateTabsFromPanel": "readonly",
         "saveStoredOptions": "readonly",
-        "searchForDuplicateTabsToClose": "readonly",
+        "searchForDupeTabsToDestroy": "readonly",
         "sendMessage": "readonly",
         "setBadge": "readonly",
-        "setBadgeIcon": "readonly",
+        "modBadgeIcon": "readonly",
         "setStoredOption": "readonly",
         "setTabBadgeBackgroundColor": "readonly",
         "setTabBadgeText": "readonly",
@@ -325,3 +325,4 @@ module.exports = {
         ]
     }
 };
+

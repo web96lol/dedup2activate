@@ -1,0 +1,31 @@
+{
+  "manifest_version": 3,
+  "name": "deDup2Activate",
+  "version": "3.5.3",
+  "author": "Peuj",
+  "default_locale": "en",
+  "description": "deDup2Activate",
+  "icons": {
+    "48": "images/auto_close_32.png"
+  },
+  "background": {
+    "service_worker": "scriptImport.js"
+  },
+  "action": {
+    "default_icon": {
+      "16": "images/auto_close_16.png",
+      "32": "images/auto_close_32.png"
+    },
+    "default_title": "deDup2Activate",
+    "default_popup": "popup/popup.html"
+  },
+  "permissions": [
+    "tabs",
+    "webNavigation",
+    "storage"
+  ],
+  "options_ui": {
+    "page": "optionPage/optionPage.html",
+    "open_in_tab": true
+  }
+}
