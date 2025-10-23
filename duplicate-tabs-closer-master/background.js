@@ -264,18 +264,12 @@ const defaultOptions = {
         value: ""
     },
     badgeColorDuplicateTabs: {
-        value: BADGE_PRIMARY_COLOR
-    },
-    badgeColorNoDuplicateTabs: {
-        value: BADGE_PRIMARY_COLOR
+        value: "#df73ff"
     },
     badgeColorNoDuplicateTabs: {
         value: "#1e90ff"
     },
     showBadgeIfNoDuplicateTabs: {
-        value: true
-    },
-    closePopup: {
         value: false
     },
     closePopup: {
